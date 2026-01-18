@@ -1,4 +1,4 @@
-package kenayperez.useraccess.entities;
+package kenayperez.useraccess2.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

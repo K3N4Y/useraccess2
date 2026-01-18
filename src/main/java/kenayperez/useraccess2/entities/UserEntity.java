@@ -8,7 +8,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,7 +17,7 @@ import java.util.UUID;
     @Setter
     @Entity
     @Table(name = "_users")
-    public class User {
+    public class UserEntity {
         @Id
         @GeneratedValue(strategy = GenerationType.UUID)
         @ColumnDefault("gen_random_uuid()")

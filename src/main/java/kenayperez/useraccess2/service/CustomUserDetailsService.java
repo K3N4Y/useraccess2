@@ -1,4 +1,4 @@
-package kenayperez.useraccess2.dto;
+package kenayperez.useraccess2.service;
 
 import kenayperez.useraccess2.entities.UserEntity;
 import kenayperez.useraccess2.repository.UserRepository;
