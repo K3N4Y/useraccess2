@@ -24,9 +24,21 @@ public class JwtTokenProvider {
     private final long expirationMs = 3600000; // 1h
 
     public JwtTokenProvider(
-            @Value("${jwt.secret}") String secret
-    ) {
+            @Value("${jwt.secret}") String secret) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private final long refreshTokenExpirationMs = 86400000; // 24h
+
+    public String generateRefreshToken(Authentication authentication) {
+        String username = authentication.getName();
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationMs))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public String generateToken(Authentication authentication) {
@@ -76,4 +88,3 @@ public class JwtTokenProvider {
     }
 
 }
-

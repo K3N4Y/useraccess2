@@ -48,4 +48,8 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public Long getExpirationTimeInSeconds() {
+        return 3600L;
+    }
 }
