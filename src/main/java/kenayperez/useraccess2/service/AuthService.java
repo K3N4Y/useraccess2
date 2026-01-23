@@ -8,6 +8,7 @@ import kenayperez.useraccess2.security.jwt.JwtTokenProvider;
 import kenayperez.useraccess2.security.jwt.SecurityUtils;
 import kenayperez.useraccess2.security.userdetails.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,20 +29,25 @@ public class AuthService {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private SecurityUtils securityUtils;
-
+    @Autowired
     AuthenticationManager authenticationManager;
 
+    @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UsernameNotFoundException("Email already exists");
-        }
-
         UserEntity user = new UserEntity();
+
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(user);
+
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException(request.getEmail());
+        }
+
         UserDto userDto = usertoDTO.toUserDto(user);
+
         return new RegisterResponse("success", "User successfully registered.", userDto);
     }
 
@@ -59,7 +65,6 @@ public class AuthService {
                 refreshToken,
                 "Bearer",
                 securityUtils.getExpirationTimeInSeconds(),
-                usertoDTO.toUserDto(user.getUser())
-        );
+                usertoDTO.toUserDto(user.getUser()));
     }
 }

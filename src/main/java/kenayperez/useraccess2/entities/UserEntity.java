@@ -1,8 +1,10 @@
 package kenayperez.useraccess2.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import kenayperez.useraccess2.dto.enums.UserStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -24,27 +26,23 @@ public class UserEntity {
     private UUID id;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @NotNull
     @Column(name = "password_hash", nullable = false, length = Integer.MAX_VALUE)
     private String passwordHash;
 
-    @Size(max = 20)
-    @ColumnDefault("'active'")
-    @Column(name = "status", length = 20)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 10)
+    private UserStatus status;
 
     @CreationTimestamp
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
 
-    @Size(max = 20)
-    @NotNull
-    @Column(name = "username")
+    @Column(name = "username", nullable = false, length = 20, unique = true)
     private String username;
 
     @ElementCollection(fetch = FetchType.EAGER)

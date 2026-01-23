@@ -20,18 +20,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-            UserEntity user =  repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserEntity user = repository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
-        return User.builder()
-                .username(user.getUsername())
-                .password(user.getPasswordHash())
-                .authorities(
-                        (GrantedAuthority) user.getRoles().stream()
-                                .map(role -> "ROLE_" + role)
-                                .toList()
-                )
-                .build();
+        return new CustomUserDetails(user);
     }
 }
-
