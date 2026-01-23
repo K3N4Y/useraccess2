@@ -1,4 +1,4 @@
-package kenayperez.useraccess2.util;
+package kenayperez.useraccess2.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
 public class JwtTokenProvider {

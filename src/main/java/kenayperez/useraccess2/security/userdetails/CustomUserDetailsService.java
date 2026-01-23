@@ -1,4 +1,4 @@
-package kenayperez.useraccess2.service;
+package kenayperez.useraccess2.security.userdetails;
 
 import kenayperez.useraccess2.entities.UserEntity;
 import kenayperez.useraccess2.repository.UserRepository;

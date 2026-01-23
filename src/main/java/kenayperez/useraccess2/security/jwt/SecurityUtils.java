@@ -1,4 +1,4 @@
-package kenayperez.useraccess2.service;
+package kenayperez.useraccess2.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public class SecurityUtils {
 
     private static final String SECRET_KEY = "tuClaveSecretaSuperSegura1234567890";
 
