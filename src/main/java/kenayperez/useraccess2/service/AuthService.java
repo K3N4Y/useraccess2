@@ -1,5 +1,6 @@
 package kenayperez.useraccess2.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import kenayperez.useraccess2.dto.*;
 import kenayperez.useraccess2.dto.mapper.UsertoDTO;
 import kenayperez.useraccess2.entities.UserEntity;
@@ -31,6 +32,8 @@ public class AuthService {
     private SecurityUtils securityUtils;
     @Autowired
     AuthenticationManager authenticationManager;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
@@ -51,13 +54,14 @@ public class AuthService {
         return new RegisterResponse("success", "User successfully registered.", userDto);
     }
 
-    @Transactional(readOnly = true)
-    public JwtResponse login(LoginRequest request) {
+    @Transactional
+    public JwtResponse login(LoginRequest request, HttpServletRequest httpRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
 
         String jwt = jwtTokenProvider.generateToken(authentication);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(authentication);
+        // Use RefreshTokenService to create a secure, hashed refresh token
+        String refreshToken = refreshTokenService.createRefreshToken(authentication.getName(), httpRequest);
 
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         return new JwtResponse(
@@ -66,5 +70,38 @@ public class AuthService {
                 "Bearer",
                 securityUtils.getExpirationTimeInSeconds(),
                 usertoDTO.toUserDto(user.getUser()));
+    }
+
+    @Transactional
+    public RefreshTokenResponse refreshAccessToken(String refreshToken, HttpServletRequest request) {
+        // Validate the refresh token and get the user
+        UserEntity user = refreshTokenService.validateRefreshToken(refreshToken);
+
+        // Create authentication object for token generation
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getUsername(),
+                null,
+                user.getRoles().stream()
+                        .map(role -> (org.springframework.security.core.GrantedAuthority) () -> role)
+                        .toList());
+
+        // Generate new access token
+        String newAccessToken = jwtTokenProvider.generateToken(authentication);
+
+        // Rotate refresh token (optional: you can keep the same token or rotate it)
+        String newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken, request);
+
+        return new RefreshTokenResponse(
+                newAccessToken,
+                newRefreshToken,
+                "Bearer",
+                securityUtils.getExpirationTimeInSeconds());
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            refreshTokenService.revokeRefreshToken(refreshToken);
+        }
     }
 }

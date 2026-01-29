@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+REFRESH_TOKEN_IMPLEMENTATION.md
+SOLUCION_ERROR_403_REFRESH.md
